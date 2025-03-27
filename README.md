@@ -14,7 +14,7 @@ composer require ody/amqp
 First, publish the configuration file:
 
 ```bash
-php ody publish ody/amqp
+php artisan publish:config ody/amqp
 ```
 
 This will create a `config/amqp.php` file where you can configure your RabbitMQ connections:
