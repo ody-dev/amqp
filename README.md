@@ -142,15 +142,15 @@ Connection pooling works transparently with the existing AMQP API:
 
 ```php
 // The publish method automatically uses pooled connections
-AMQP::publish(UserCreatedProducer::class, [
+$this->amqpClient->publish(UserCreatedProducer::class, [
     $user->id,
     $user->email,
     $user->username
 ]);
 
 // For advanced usage, you can directly access pooled resources
-$connection = AMQP::getPooledConnection();
-$channel = AMQP::getPooledChannel();
+$connection = $this->amqpClient->getPooledConnection();
+$channel = $this->amqpClient->getPooledChannel();
 ```
 
 ## Creating Producers
@@ -240,6 +240,11 @@ To publish messages in your application code:
 use Ody\AMQP\AMQP;
 use App\Producers\UserCreatedProducer;
 
+public function __construct(
+    private readonly AMQPClient $ampqClient
+)
+{}
+
 // In your controller or service
 public function registerUser(array $userData)
 {
@@ -247,7 +252,7 @@ public function registerUser(array $userData)
     $user = $this->userRepository->create($userData);
     
     // Publish event
-    AMQP::publish(UserCreatedProducer::class, [
+    $this->amqpClient->publish(UserCreatedProducer::class, [
         $user->id,              // userId
         $user->email,           // email
         $user->username         // username
@@ -263,7 +268,7 @@ You can publish messages with a delay:
 
 ```php
 // Send a reminder after 24 hours
-AMQP::publishDelayed(ReminderProducer::class, [
+$this->amqpClient->publishDelayed(ReminderProducer::class, [
     $user->id,
     'Your trial is about to expire'
 ], 86400000); // 24 hours in milliseconds
